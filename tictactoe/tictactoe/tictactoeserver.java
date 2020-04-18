@@ -1,21 +1,25 @@
 package tictactoe;
 
+// Josh Sample & Jack Thurber
+// CSCI 4300
+// Project 2
+
+// imports used for server side
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import javax.swing.JOptionPane;
 
 
 public class tictactoeserver {
-
-
     /**
      * Runs the application. Pairs up clients that connect.
      */
     public static void main(String[] args) throws Exception {
-        ServerSocket listener = new ServerSocket(8901);
+        ServerSocket listener = new ServerSocket(9010);
         System.out.println("Tic Tac Toe Server is Running");
         try {
             while (true) {
@@ -178,7 +182,7 @@ public synchronized boolean legalMove(int location, Player player) {
                                          : boardFilledUp() ? "TIE"
                                          : "");
                         } else {
-                            output.println("MESSAGE ?");
+                        	output.println("INVALID_MOVE");
                         }
                     } else if (command.startsWith("QUIT")) {
                         return;

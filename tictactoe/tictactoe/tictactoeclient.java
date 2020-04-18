@@ -1,14 +1,20 @@
 package tictactoe;
 
+//Josh Sample & Jack Thurber
+//CSCI 4300
+//Project 2
+
+// libraries used, includes socket communication and swing libraries
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.Frame;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -26,7 +32,7 @@ public class tictactoeclient {
     private Square[] board = new Square[9];
     private Square currentSquare;
 
-    private static int PORT = 8901;
+    private static int PORT = 9010;
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
@@ -36,7 +42,7 @@ public class tictactoeclient {
      * GUI and registering GUI listeners.
      */
     public tictactoeclient(String serverAddress) throws Exception {
-
+    	frame.setIconImage(Toolkit.getDefaultToolkit().getImage("./icon.jpg"));
         // Setup networking
         socket = new Socket(serverAddress, PORT);
         in = new BufferedReader(new InputStreamReader(
@@ -107,6 +113,8 @@ public class tictactoeclient {
                     break;
                 } else if (response.startsWith("MESSAGE")) {
                     messageLabel.setText(response.substring(8));
+                } else if (response.startsWith("INVALID_MOVE")) {
+                	messageLabel.setText("Invalid move");
                 }
             }
             out.println("QUIT");
@@ -148,10 +156,10 @@ public class tictactoeclient {
      */
     public static void main(String[] args) throws Exception {
         while (true) {
-            String serverAddress = (args.length == 0) ? "localhost" : args[1];
+            String serverAddress = (args.length == 0) ? "localhost" : args[0];
             tictactoeclient client = new tictactoeclient(serverAddress);
             client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            client.frame.setSize(900, 900);
+            client.frame.setSize(750, 800);
             client.frame.setVisible(true);
             client.frame.setResizable(false);
             client.play();
