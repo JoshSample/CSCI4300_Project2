@@ -22,148 +22,134 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-
+// client class
 public class tictactoeclient {
-    private JFrame frame = new JFrame("Tic Tac Toe");
-    private JLabel messageLabel = new JLabel("");
-    private ImageIcon icon;
-    private ImageIcon opponentIcon;
+	// variables needed for socket communication and gui elements
+    private JFrame frame;	// names the frame
+    private JLabel message;	// used for setting text on client window
+    private ImageIcon icon;	// the primary icon, either x or o, for this client
+    private ImageIcon opponentIcon;	// the oppoenents icon, dependent on if this client is x or o
+    private Square[] board;	// tic tac toe board, will have 9 sqares
+    private Square currentSquare;	// keeps track of current square that was clicked
+    private static int PORT = 9010;	// 9010 is the port we are using
+    private Socket socket;	// used for connecting to server
+    private BufferedReader input;	// gets input from client
+    private PrintWriter output;	// outputs to server
 
-    private Square[] board = new Square[9];
-    private Square currentSquare;
-
-    private static int PORT = 9010;
-    private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
-
-    /**
-     * Constructs the client by connecting to a server, laying out the
-     * GUI and registering GUI listeners.
-     */
+    // default constructor, connects to server and creates GUI
     public tictactoeclient(String serverAddress) throws Exception {
-    	frame.setIconImage(Toolkit.getDefaultToolkit().getImage("./icon.jpg"));
-        // Setup networking
+    	frame = new JFrame("TicTacToe By Jack and Josh");
+    	message = new JLabel("");
+    	board = new Square[9];
+    	// custom icon for application
+    	frame.setIconImage(Toolkit.getDefaultToolkit().getImage("./icon.png"));
+        // connect to socket
         socket = new Socket(serverAddress, PORT);
-        in = new BufferedReader(new InputStreamReader(
-            socket.getInputStream()));
-        out = new PrintWriter(socket.getOutputStream(), true);
-
+        input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        output = new PrintWriter(socket.getOutputStream(), true);
         // Layout GUI
-        messageLabel.setBackground(Color.lightGray);
-        frame.getContentPane().add(messageLabel, "South");
-
+        message.setBackground(Color.RED);
+        frame.add(message, "North");
+        // the following code creates a 3x3 tic tac toe board
         JPanel boardPanel = new JPanel();
         boardPanel.setBackground(Color.black);
-        boardPanel.setLayout(new GridLayout(3, 3, 2, 2));
+        boardPanel.setLayout(new GridLayout(3, 3, 5, 5));
+        // fills up the board with squares
         for (int i = 0; i < board.length; i++) {
             final int j = i;
             board[i] = new Square();
             board[i].addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
                     currentSquare = board[j];
-                    out.println("MOVE " + j);}});
+                    output.println("MOVE " + j);}});
             boardPanel.add(board[i]);
         }
-        frame.getContentPane().add(boardPanel, "Center");
+        frame.add(boardPanel, "Center");
     }
 
-    /**
-     * The main thread of the client will listen for messages
-     * from the server.  The first message will be a "WELCOME"
-     * message in which we receive our mark.  Then we go into a
-     * loop listening for "VALID_MOVE", "OPPONENT_MOVED", "VICTORY",
-     * "DEFEAT", "TIE", "OPPONENT_QUIT or "MESSAGE" messages,
-     * and handling each message appropriately.  The "VICTORY",
-     * "DEFEAT" and "TIE" ask the user whether or not to play
-     * another game.  If the answer is no, the loop is exited and
-     * the server is sent a "QUIT" message.  If an OPPONENT_QUIT
-     * message is recevied then the loop will exit and the server
-     * will be sent a "QUIT" message also.
-     */
+    // this thread handles messages from the server and processes them
     public void play() throws Exception {
         String response;
         try {
-            response = in.readLine();
+            response = input.readLine();
+            // "WELCOME" is a mark which decides if a player will be an x or o
             if (response.startsWith("WELCOME")) {
                 char mark = response.charAt(8);
+                // sets icon to either x or o depending on when this client connected
                 icon = new ImageIcon(mark == 'X' ? "x.png" : "o.png");
                 opponentIcon  = new ImageIcon(mark == 'X' ? "o.png" : "x.png");
                 frame.setTitle("Tic Tac Toe - Player " + mark);
             }
             while (true) {
-                response = in.readLine();
+                response = input.readLine();
+                // "VALID_MOVE" sets icon in the square, sends message back to client
                 if (response.startsWith("VALID_MOVE")) {
-                    messageLabel.setText("Valid move, please wait");
+                    message.setText("Valid move, please wait");
                     currentSquare.setIcon(icon);
                     currentSquare.repaint();
+                // "OPPONENT_MOVED" sets opponent icon to square and sends message to other client
                 } else if (response.startsWith("OPPONENT_MOVED")) {
                     int loc = Integer.parseInt(response.substring(15));
                     board[loc].setIcon(opponentIcon);
                     board[loc].repaint();
-                    messageLabel.setText("Opponent moved, your turn");
+                    message.setText("Opponent moved, your turn");
+                // if there is a winner, send message to winning client
                 } else if (response.startsWith("VICTORY")) {
-                    messageLabel.setText("You win");
+                    message.setText("You win!");
                     break;
+                // if winner, sends message to losing client
                 } else if (response.startsWith("DEFEAT")) {
-                    messageLabel.setText("You lose");
+                    message.setText("You lose :(");
                     break;
+                // if there's a tie, sends message to both clients
                 } else if (response.startsWith("TIE")) {
-                    messageLabel.setText("You tied");
+                    message.setText("You tied");
                     break;
+                // for miscellaneous messages
                 } else if (response.startsWith("MESSAGE")) {
-                    messageLabel.setText(response.substring(8));
+                    message.setText(response.substring(8));
+                // for when an illegal move is performed
                 } else if (response.startsWith("INVALID_MOVE")) {
-                	messageLabel.setText("Invalid move");
+                	message.setText("Invalid move");
                 }
             }
-            out.println("QUIT");
+            output.println("QUIT");
         }
         finally {
             socket.close();
         }
     }
 
-    private boolean wantsToPlayAgain() {
-        int response = JOptionPane.showConfirmDialog(frame,
-            "Want to play again?",
-            "Tic Tac Toe is Fun Fun Fun",
-            JOptionPane.YES_NO_OPTION);
+    // asks clients to a rematch
+    private boolean playAgain() {
+        int response = JOptionPane.showConfirmDialog(frame, "Rematch?", "TicTacToe Jack and Josh", JOptionPane.YES_NO_OPTION);
         frame.dispose();
         return response == JOptionPane.YES_OPTION;
     }
 
-    /**
-     * Graphical square in the client window.  Each square is
-     * a white panel containing.  A client calls setIcon() to fill
-     * it with an Icon, presumably an X or O.
-     */
+    // a square in the board, sets an icon to it once a player selects an avaliable square
     static class Square extends JPanel {
         JLabel label = new JLabel((Icon)null);
-
         public Square() {
-            setBackground(Color.white);
+            setBackground(Color.LIGHT_GRAY);
             add(label);
         }
-
         public void setIcon(Icon icon) {
             label.setIcon(icon);
         }
     }
 
-    /**
-     * Runs the client as an application.
-     */
+    // the driver that executes all of the clients methods
     public static void main(String[] args) throws Exception {
         while (true) {
-            String serverAddress = (args.length == 0) ? "localhost" : args[0];
+            String serverAddress = ("localhost");
             tictactoeclient client = new tictactoeclient(serverAddress);
             client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             client.frame.setSize(750, 800);
             client.frame.setVisible(true);
-            client.frame.setResizable(false);
+            client.frame.setResizable(true);
             client.play();
-            if (!client.wantsToPlayAgain()) {
+            if (!client.playAgain()) {
                 break;
             }
         }

@@ -11,16 +11,85 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Toolkit;
 
 
 public class tictactoeserver {
-    /**
-     * Runs the application. Pairs up clients that connect.
-     */
+    
+	// driver that sets up server gui, connects clients to server
     public static void main(String[] args) throws Exception {
         ServerSocket listener = new ServerSocket(9010);
-        System.out.println("Tic Tac Toe Server is Running");
+        JFrame frame = new JFrame();
+        // custom icon for application
+    	frame.setIconImage(Toolkit.getDefaultToolkit().getImage("./icon.png"));
+        frame.getContentPane().setBackground(Color.WHITE);
+        frame.setBounds(100, 100, 450, 300);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(null);
+
+        JLabel header = new JLabel("");
+        header.setBounds(10, 10, 416, 0);
+        frame.getContentPane().add(header);
+
+        JLabel lblServerIsRunning = new JLabel("Server Is Running!");
+        lblServerIsRunning.setToolTipText("Server is Running");
+        lblServerIsRunning.setBackground(Color.WHITE);
+        lblServerIsRunning.setFont(new Font("OCR A Extended", Font.BOLD | Font.ITALIC, 22));
+        lblServerIsRunning.setForeground(Color.GREEN);
+        lblServerIsRunning.setBounds(112, 130, 289, 81);
+        frame.getContentPane().add(lblServerIsRunning);
+
+        JTextArea txtrServerIsRunning = new JTextArea();
+        txtrServerIsRunning.setForeground(Color.GREEN);
+        txtrServerIsRunning.setEditable(false);
+        txtrServerIsRunning.setFont(new Font("OCR A Extended", Font.BOLD | Font.ITALIC, 22));
+        txtrServerIsRunning.setBackground(Color.BLACK);
+        txtrServerIsRunning.setBounds(2, 81, 442, 180);
+        frame.getContentPane().add(txtrServerIsRunning);
+        lblServerIsRunning.setLabelFor(txtrServerIsRunning);
+
+        JLabel lblNewLabel = new JLabel("New label");
+        lblNewLabel.setIcon(new ImageIcon(tictactoeserver.class.getClassLoader().getResource("XSmall.png")));
+        lblNewLabel.setBounds(10, 10, 60, 60);
+        frame.getContentPane().add(lblNewLabel);
+
+        JLabel lblNewLabel_1 = new JLabel("New label");
+        lblNewLabel_1.setIcon(new ImageIcon(tictactoeserver.class.getClassLoader().getResource("XSmall.png")));
+        lblNewLabel_1.setBounds(154, 10, 60, 60);
+        frame.getContentPane().add(lblNewLabel_1);
+
+        JLabel lblNewLabel_1_1 = new JLabel("New label");
+        lblNewLabel_1_1.setIcon(new ImageIcon(tictactoeserver.class.getClassLoader().getResource("XSmall.png")));
+        lblNewLabel_1_1.setBounds(303, 10, 60, 60);
+        frame.getContentPane().add(lblNewLabel_1_1);
+
+        JLabel lblNewLabel_2 = new JLabel("");
+        lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 50));
+        lblNewLabel_2.setIcon(new ImageIcon(tictactoeserver.class.getClassLoader().getResource("osmall.png")));
+        lblNewLabel_2.setBounds(80, 10, 60, 60);
+        frame.getContentPane().add(lblNewLabel_2);
+
+        JLabel lblNewLabel_2_1 = new JLabel("");
+        lblNewLabel_2_1.setIcon(new ImageIcon(tictactoeserver.class.getClassLoader().getResource("osmall.png")));
+        lblNewLabel_2_1.setFont(new Font("Tahoma", Font.PLAIN, 50));
+        lblNewLabel_2_1.setBounds(224, 10, 60, 60);
+        frame.getContentPane().add(lblNewLabel_2_1);
+
+        JLabel lblNewLabel_2_1_1 = new JLabel("");
+        lblNewLabel_2_1_1.setIcon(new ImageIcon(tictactoeserver.class.getClassLoader().getResource("osmall.png")));
+        lblNewLabel_2_1_1.setFont(new Font("Tahoma", Font.PLAIN, 50));
+        lblNewLabel_2_1_1.setBounds(373, 10, 60, 60);
+        frame.getContentPane().add(lblNewLabel_2_1_1);
+        frame.setTitle("TicTacToe Jack and Josh - Server ");
+        frame.setVisible(true);
+        frame.setResizable(false);
         try {
             while (true) {
                 Game game = new Game();
@@ -138,7 +207,8 @@ public synchronized boolean legalMove(int location, Player player) {
                 output.println("WELCOME " + mark);
                 output.println("MESSAGE Waiting for opponent to connect");
             } catch (IOException e) {
-                System.out.println("Player died: " + e);
+            	JFrame frame = new JFrame();
+            	JOptionPane.showMessageDialog(frame, "Player has left the server", "Error", 1);
             }
         }
 
@@ -189,9 +259,12 @@ public synchronized boolean legalMove(int location, Player player) {
                     }
                 }
             } catch (IOException e) {
-                System.out.println("Player died: " + e);
+            	JFrame frame = new JFrame();
+            	JOptionPane.showMessageDialog(frame, "Player has left the server", "Error", 1);
             } finally {
-                try {socket.close();} catch (IOException e) {}
+                try {
+                	socket.close();
+                } catch (IOException e) {}
             }
         }
     }
