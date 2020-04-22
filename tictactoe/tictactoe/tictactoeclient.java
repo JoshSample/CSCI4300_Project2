@@ -1,6 +1,6 @@
 package tictactoe;
 
-//Josh Sample & Jack Thurber
+//Josh Sample(B01218906) & Jack Thurber
 //CSCI 4300
 //Project 2
 
