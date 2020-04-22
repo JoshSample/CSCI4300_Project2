@@ -28,7 +28,7 @@ public class tictactoeserver {
 		ServerSocket listener = new ServerSocket(9010);
 		JFrame frame = new JFrame();
 		// custom icon for application
-		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("./icon.png"));
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icon.png"));
 
 		// The following chunks of code are for the gui of the server
 		frame.getContentPane().setBackground(Color.WHITE);

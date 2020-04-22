@@ -44,7 +44,7 @@ public class tictactoeclient {
     	message.setFont(new Font("OCR A Extended", Font.PLAIN, message.getFont().getSize()));
     	board = new Square[9];
     	// custom icon for application
-    	frame.setIconImage(Toolkit.getDefaultToolkit().getImage("./icon.png"));
+    	frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icon.png"));
         // connect to socket
         socket = new Socket(serverAddress, 9010);
         input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -77,8 +77,15 @@ public class tictactoeclient {
             if (response.startsWith("WELCOME")) {
                 char mark = response.charAt(8);
                 // sets icon to either x or o depending on when this client connected
-                icon = new ImageIcon(mark == 'X' ? "x.png" : "o.png");
-                opponentIcon  = new ImageIcon(mark == 'X' ? "o.png" : "x.png");
+                if (mark == 'X') {
+                	icon = new ImageIcon(tictactoeclient.class.getClassLoader().getResource("x.png"));
+                	opponentIcon = new ImageIcon(tictactoeclient.class.getClassLoader().getResource("o.png"));
+                }
+                else {
+                	icon = new ImageIcon(tictactoeclient.class.getClassLoader().getResource("o.png"));
+                	opponentIcon = new ImageIcon(tictactoeclient.class.getClassLoader().getResource("x.png"));
+                }
+                
                 frame.setTitle("Tic Tac Toe - Player " + mark);
             }
             while (true) {
