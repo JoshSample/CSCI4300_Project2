@@ -1,11 +1,14 @@
 package tictactoe;
 
+import java.awt.BorderLayout;
+
 //Josh Sample & Jack Thurber
 //CSCI 4300
 //Project 2
 
 // libraries used, includes socket communication and swing libraries
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Frame;
 import java.awt.Toolkit;
@@ -21,6 +24,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 // client class
 public class tictactoeclient {
@@ -29,9 +33,8 @@ public class tictactoeclient {
     private JLabel message;	// used for setting text on client window
     private ImageIcon icon;	// the primary icon, either x or o, for this client
     private ImageIcon opponentIcon;	// the oppoenents icon, dependent on if this client is x or o
-    private Square[] board;	// tic tac toe board, will have 9 sqares
+    private Square[] board;	// tic tac toe board, will have 9 squares
     private Square currentSquare;	// keeps track of current square that was clicked
-    private static int PORT = 9010;	// 9010 is the port we are using
     private Socket socket;	// used for connecting to server
     private BufferedReader input;	// gets input from client
     private PrintWriter output;	// outputs to server
@@ -39,17 +42,17 @@ public class tictactoeclient {
     // default constructor, connects to server and creates GUI
     public tictactoeclient(String serverAddress) throws Exception {
     	frame = new JFrame("TicTacToe By Jack and Josh");
-    	message = new JLabel("");
+    	message = new JLabel("", SwingConstants.CENTER);
+    	message.setFont(new Font("OCR A Extended", Font.PLAIN, message.getFont().getSize()));
     	board = new Square[9];
     	// custom icon for application
     	frame.setIconImage(Toolkit.getDefaultToolkit().getImage("./icon.png"));
         // connect to socket
-        socket = new Socket(serverAddress, PORT);
+        socket = new Socket(serverAddress, 9010);
         input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         output = new PrintWriter(socket.getOutputStream(), true);
         // Layout GUI
-        message.setBackground(Color.RED);
-        frame.add(message, "North");
+        frame.add(message, BorderLayout.NORTH);
         // the following code creates a 3x3 tic tac toe board
         JPanel boardPanel = new JPanel();
         boardPanel.setBackground(Color.black);
@@ -84,7 +87,7 @@ public class tictactoeclient {
                 response = input.readLine();
                 // "VALID_MOVE" sets icon in the square, sends message back to client
                 if (response.startsWith("VALID_MOVE")) {
-                    message.setText("Valid move, please wait");
+                    message.setText("Valid move, opponents turn");
                     currentSquare.setIcon(icon);
                     currentSquare.repaint();
                 // "OPPONENT_MOVED" sets opponent icon to square and sends message to other client
@@ -129,7 +132,7 @@ public class tictactoeclient {
 
     // a square in the board, sets an icon to it once a player selects an avaliable square
     static class Square extends JPanel {
-        JLabel label = new JLabel((Icon)null);
+        JLabel label = new JLabel();
         public Square() {
             setBackground(Color.LIGHT_GRAY);
             add(label);
