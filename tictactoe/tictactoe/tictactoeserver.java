@@ -100,7 +100,7 @@ public class tictactoeserver {
 				Game.Player player1 = game.new Player(listener.accept(), 'X');
 				Game.Player player2 = game.new Player(listener.accept(), 'O');
 				player1.setOpponent(player2);
-				player1.setOpponent(player2);
+				player2.setOpponent(player1);
 				game.currentPlayer = player1;
 				player1.start();
 				player2.start();
@@ -168,12 +168,11 @@ class Game {
 		PrintWriter output;
 
 		// Here is where the socket is created and the first two messages are displayed on the screen
-		public Player(Socket socket, char mark) {
-			this.socket = socket;
-			this.mark = mark;
+		public Player(Socket s, char m) {
+			socket = s;
+			mark = m;
 			try {
-				input = new BufferedReader(
-						new InputStreamReader(socket.getInputStream()));
+				input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				output = new PrintWriter(socket.getOutputStream(), true);
 				output.println("WELCOME " + mark);
 				output.println("MESSAGE Listening for connections...");
@@ -191,8 +190,10 @@ class Game {
 		// controls the opponent player messages and movement
 		public void otherPlayerMoved(int location) {
 			output.println("OPPONENT_MOVED " + location);
-			output.println(
-					hasWinner() ? "DEFEAT" : filledBoard() ? "TIE" : "");
+			if (hasWinner()) 
+				output.println("DEFEAT");
+			else if (filledBoard()) 
+				output.println("TIE");
 		}
 
 		// a method of the thread class, this handles the threads
@@ -202,9 +203,8 @@ class Game {
 				output.println("MESSAGE All players connected");
 
 				// Tell the first player that it is her turn.
-				if (mark == 'X') {
+				if (mark == 'X') 
 					output.println("MESSAGE Your move");
-				}
 
 				// Repeatedly get commands from the client and process them.
 				while (true) {
@@ -213,15 +213,15 @@ class Game {
 						int location = Integer.parseInt(command.substring(5));
 						if (legalMove(location, this)) {
 							output.println("VALID_MOVE");
-							output.println(hasWinner() ? "VICTORY"
-									: filledBoard() ? "TIE"
-											: "");
-						} else {
+							if (hasWinner()) 
+								output.println("DEFEAT");
+							else if (filledBoard()) 
+								output.println("TIE");
+						} 
+						else 
 							output.println("INVALID_MOVE");
-						}
-					} else if (command.startsWith("QUIT")) {
-						return;
-					}
+					} 
+					else if (command.startsWith("QUIT")) return;
 				}
 			} catch (IOException e) {
 				JFrame frame = new JFrame();

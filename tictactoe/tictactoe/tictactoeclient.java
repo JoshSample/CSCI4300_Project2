@@ -1,7 +1,5 @@
 package tictactoe;
 
-import java.awt.BorderLayout;
-
 //Josh Sample & Jack Thurber
 //CSCI 4300
 //Project 2
@@ -10,8 +8,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Frame;
 import java.awt.Toolkit;
+import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -90,29 +88,35 @@ public class tictactoeclient {
                     message.setText("Valid move, opponents turn");
                     currentSquare.setIcon(icon);
                     currentSquare.repaint();
+                } 
                 // "OPPONENT_MOVED" sets opponent icon to square and sends message to other client
-                } else if (response.startsWith("OPPONENT_MOVED")) {
+                else if (response.startsWith("OPPONENT_MOVED")) {
                     int loc = Integer.parseInt(response.substring(15));
                     board[loc].setIcon(opponentIcon);
                     board[loc].repaint();
                     message.setText("Opponent moved, your turn");
+                } 
                 // if there is a winner, send message to winning client
-                } else if (response.startsWith("VICTORY")) {
+                else if (response.startsWith("VICTORY")) {
                     message.setText("You win!");
                     break;
+                }
                 // if winner, sends message to losing client
-                } else if (response.startsWith("DEFEAT")) {
+                else if (response.startsWith("DEFEAT")) {
                     message.setText("You lose :(");
                     break;
+                } 
                 // if there's a tie, sends message to both clients
-                } else if (response.startsWith("TIE")) {
-                    message.setText("You tied");
+                else if (response.startsWith("TIE")) {
+                    message.setText("Draw");
                     break;
+                } 
                 // for miscellaneous messages
-                } else if (response.startsWith("MESSAGE")) {
+                else if (response.startsWith("MESSAGE")) {
                     message.setText(response.substring(8));
+                }
                 // for when an illegal move is performed
-                } else if (response.startsWith("INVALID_MOVE")) {
+                else if (response.startsWith("INVALID_MOVE")) {
                 	message.setText("Invalid move");
                 }
             }
