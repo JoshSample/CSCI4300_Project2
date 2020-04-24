@@ -126,7 +126,7 @@ class Game {
 
 	// checks the board for a players win condition whether it is horizontal vertical or diagonal
 	public boolean hasWinner() {
-		return  (board[0] != null && board[0] == board[1] && board[0] == board[2])
+		return (board[0] != null && board[0] == board[1] && board[0] == board[2])
 				||(board[3] != null && board[3] == board[4] && board[3] == board[5])
 				||(board[6] != null && board[6] == board[7] && board[6] == board[8])
 				||(board[0] != null && board[0] == board[3] && board[0] == board[6])
@@ -214,7 +214,7 @@ class Game {
 						if (legalMove(location, this)) {
 							output.println("VALID_MOVE");
 							if (hasWinner()) 
-								output.println("DEFEAT");
+								output.println("VICTORY");
 							else if (filledBoard()) 
 								output.println("TIE");
 						} 
